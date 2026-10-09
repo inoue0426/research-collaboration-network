@@ -1,26 +1,21 @@
 # Research Collaboration Network
 
-Interactive OpenAlex coauthorship explorer for Augustin Luna and Rui Kuang.
-
-## Run
-Open `index.html` in a browser or serve the folder with `python -m http.server 8000`. The app requests public OpenAlex data directly; internet access is required.
+GitHub Pages app for exploring OpenAlex coauthorship connections from **Augustin Luna** and **Rui Kuang**.
 
 ## Features
-- Choose a seed researcher and fetch up to 800 of their latest indexed works.
-- Count shared papers, show most recent shared publication year and institutions.
-- Filter coauthors and explore an interactive D3 graph.
-- Click coauthors for source-linked publication evidence.
+- Combined direct-coauthor graph, with both seed researchers visible.
+- Institution and region filters for Broad, Dana-Farber, Harvard, MIT, Stanford, Boston/Cambridge, and the Bay Area.
+- Heuristic ranking using direct shared-paper counts, publication recency, and hop distance.
+- Click an author to view linked shared-publication evidence.
+- On-demand second-hop exploration: click a direct coauthor, then **Explore 2-hop collaborators**.
 
-## Limitations
-- The graph is a **star network**, not a complete multi-hop network.
-- Counts are based on the fetched subset of OpenAlex-indexed papers, not complete lifetime coauthorship.
-- Institution names may represent historical affiliations; they are not guaranteed current.
-- The author is matched by exact name; verify identity and publication results.
-- Coauthorship is **not** evidence of a warm introduction.
-- The app does not yet rank postdoc fit or map introductions to specific labs.
+## Caveats
+- This is **not** a verified PI directory, and does not assert a personal connection or willingness to introduce.
+- OpenAlex `last_known_institutions` may be historical or incomplete. The filter is an affiliation hint, not verified current employment.
+- Author matching uses exact display names and should be verified for homonyms.
+- Counts use up to 400 latest indexed works per seed and 200 per expanded intermediate, so they are incomplete.
+- Scores are exploratory, not calibrated probabilities. Two-hop links are via the named intermediary and do not imply that an introduction is possible.
+- The browser uses OpenAlex's public API; availability and rate limits may affect loading. See https://help.openalex.org/api/.
 
-## GitHub Pages
-Repository Settings → Pages → Deploy from a branch → `main` / `(root)`. For private repositories, Pages availability depends on the account plan and repository settings.
-
-## Data
-[OpenAlex](https://openalex.org/) public API. No API key is stored.
+## Publish
+Settings → Pages → Deploy from branch → main → root. No build required.
