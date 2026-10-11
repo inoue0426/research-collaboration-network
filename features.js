@@ -99,6 +99,7 @@ function drawTopicGraph(selected) {
 graph = function(selected) {
   if (($('layout')?.value || 'network') === 'topic') {
     drawTopicGraph(selected);
+    enableGraphZoom('graph');
     return;
   }
   if (topicSimulation) { topicSimulation.stop(); topicSimulation = null; }
@@ -107,4 +108,68 @@ graph = function(selected) {
     .attr('stroke-width', d => Math.max(6, Math.min(8, Math.sqrt(d.count))))
     .style('cursor', 'pointer')
     .on('click', (event, d) => { event.stopPropagation(); showEdgeEvidence(d); });
+  enableGraphZoom('graph');
+};
+
+// Wrap every graph render in a transformable group. Existing node drag and
+// link click handlers remain attached to the SVG elements inside the group.
+const zoomBehaviors = new Map();
+function graphStage(id) {
+  const svg = $(id), stage = document.createElement('div');
+  stage.className = 'graph-stage' + (id === 'path-graph' ? ' path-graph-stage' : '');
+  if (id === 'path-graph') stage.hidden = true;
+  svg.parentNode.insertBefore(stage, svg);
+  stage.appendChild(svg);
+  const toolbar = document.createElement('div');
+  toolbar.className = 'graph-zoom-controls';
+  toolbar.setAttribute('aria-label', 'Graph zoom controls');
+  for (const [label, action, title] of [
+    ['+', 'in', 'Zoom in'], ['−', 'out', 'Zoom out'], ['↺', 'reset', 'Reset zoom']
+  ]) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    button.title = title;
+    button.setAttribute('aria-label', title);
+    button.addEventListener('click', () => {
+      const zoom = zoomBehaviors.get(id);
+      if (!zoom) return;
+      const selection = d3.select(svg).transition().duration(200);
+      if (action === 'reset') selection.call(zoom.transform, d3.zoomIdentity);
+      else selection.call(zoom.scaleBy, action === 'in' ? 1.5 : 1 / 1.5);
+    });
+    toolbar.appendChild(button);
+  }
+  stage.appendChild(toolbar);
+  return stage;
+}
+const networkStage = graphStage('graph');
+const pathStage = graphStage('path-graph');
+const zoomStyle = document.createElement('style');
+zoomStyle.textContent = '.graph-stage{position:relative;min-width:0;min-height:0;overflow:hidden}'
+  + '.graph-stage[hidden]{display:none}'
+  + '.graph-stage #graph,.graph-stage #path-graph{display:block;width:100%;height:100%}'
+  + '.path-graph-stage{height:330px}'
+  + '.graph-zoom-controls{position:absolute;right:12px;top:12px;display:flex;gap:4px;z-index:2}'
+  + '.graph-zoom-controls button{width:34px;height:34px;margin:0;padding:0;font-size:19px;background:#26384e;border:1px solid #64748b}'
+  + '.graph-zoom-controls button:hover{background:#34557a}'
+  + '@media(max-width:800px){.graph-stage:not(.path-graph-stage){height:60vh}}';
+document.head.appendChild(zoomStyle);
+
+function enableGraphZoom(id) {
+  const svg = d3.select('#' + id);
+  const layer = svg.append('g').attr('class', 'zoom-layer');
+  const parent = layer.node();
+  for (const child of [...svg.node().children])
+    if (child !== parent) parent.appendChild(child);
+  const zoom = d3.zoom().scaleExtent([0.4, 5])
+    .on('zoom', event => layer.attr('transform', event.transform));
+  zoomBehaviors.set(id, zoom);
+  svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
+}
+const baseShowPathGraph = showPathGraph;
+showPathGraph = function(...args) {
+  pathStage.hidden = false;
+  baseShowPathGraph(...args);
+  enableGraphZoom('path-graph');
 };
