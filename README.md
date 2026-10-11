@@ -11,7 +11,7 @@ A browser-based tool for exploring coauthorship links in [OpenAlex](https://open
 1. Select **Explore Network** and click **Load combined network**.
 2. Explore direct coauthors of Augustin Luna, Rui Kuang, and Tobias Kind. Researchers found among Yoshitaka Inoue's retrieved coauthors are excluded from the candidate list.
 3. Filter by institution or region, connection depth, shared-paper count, or name; switch between institution clusters and a collaboration layout.
-4. Hover over a node to highlight its coauthorship links. Click a researcher to see connected researchers, broad OpenAlex topics, and linked publication evidence. Click **Explore 2-hop collaborators via this author** to load additional candidates through that researcher.
+4. Hover over a node to highlight its coauthorship links. Click a coauthorship line to see its shared papers, or click a researcher to see connected researchers, broad OpenAlex topics, and linked publication evidence. Choose **Topic connections** to see researchers grouped by their most common OpenAlex topics; topic links indicate classification, not coauthorship. Click **Explore 2-hop collaborators via this author** to load additional candidates through that researcher.
 
 Institution clusters reflect common affiliations in the retrieved data. Candidate ranking is a heuristic based on shared-paper counts, recency, and path length.
 
